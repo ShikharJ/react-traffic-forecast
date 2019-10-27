@@ -81,8 +81,8 @@ const WeatherCard = memo(props => {
             </Temperature>
 
             <Additional>
-                <div>humidity: {day.humidity} %</div>
-                <div>speed: {day.speed} mps</div>
+                <div>Incoming Traffic: {day.humidity} %</div>
+                <div>Outgoing Traffic: {day.speed} mps</div>
             </Additional>
         </Card>
     );
