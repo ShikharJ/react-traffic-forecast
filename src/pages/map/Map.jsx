@@ -23,7 +23,10 @@ class Map extends PureComponent {
         super(props);
 
         this.map = null;
-        this.marker = null;
+        this.latest = true;
+        this.marker1 = null;
+        this.marker2 = null;
+        this.latlngs = [];
         this.polyline = null;
         this.tileLayerUrl = 'https://{s}.tile.osm.org/{z}/{x}/{y}.png';
     }
@@ -34,7 +37,9 @@ class Map extends PureComponent {
 
     componentDidUpdate() {
         const { popupText } = this.props;
-        if (this.marker && popupText) this.marker.bindPopup(popupText).openPopup();
+
+        if (this.marker1 && popupText && this.latest) this.marker1.bindPopup(popupText).openPopup();
+        if (this.marker2 && popupText && !this.latest) this.marker2.bindPopup(popupText).openPopup();
     }
 
     componentWillUnmount() {
@@ -47,47 +52,68 @@ class Map extends PureComponent {
         this.map = L.map('map');
         L.tileLayer(this.tileLayerUrl, {
             attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
-            maxZoom: 18
+            maxZoom: 15
         }).addTo(this.map);
 
-        this.setMarker({
+        this.latlngs = [[coord.lat, coord.lon],
+                        [coord.lat, coord.lon]];
+        this.polyline = L.polyline(this.latlngs, {color: 'red'}).addTo(this.map);
+        this.map.fitBounds(this.polyline.getBounds());
+
+        this.setStartMarker({
+            lat: coord.lat,
+            lng: coord.lon
+        });
+
+        this.setEndMarker({
             lat: coord.lat,
             lng: coord.lon
         });
 
         this.map.on('click', ({ latlng }) => {
-            if (typeof this.marker !== 'undefined') this.map.removeLayer(this.marker);
+            this.latest = true;
+            if (typeof this.marker1 !== 'undefined') this.map.removeLayer(this.marker1);
             if (typeof this.polyline !== 'undefined') this.map.removeLayer(this.polyline);
-            this.setMarker(latlng, () => {
-                this.whenMarkerSet(latlng);
+            this.setStartMarker(latlng, () => {
+                this.whenStartMarkerSet(latlng);
+            });
+        });
+
+        this.map.on('contextmenu', ({ latlng }) => {
+            this.latest = false;
+            if (typeof this.marker2 !== 'undefined') this.map.removeLayer(this.marker2);
+            if (typeof this.polyline !== 'undefined') this.map.removeLayer(this.polyline);
+            this.setEndMarker(latlng, () => {
+                this.whenEndMarkerSet(latlng);
             });
         });
     }
 
-    setMarker(latlng, callback) {
-        this.map.setView(latlng, 13);
-        this.marker = L.marker(latlng).addTo(this.map);
-        var latlngs = [[latlng.lat, latlng.lng],
-                       [40.7317, -73.9867]];
-        this.polyline = L.polyline(latlngs, {color: 'blue'}).addTo(this.map);
-        // zoom the map to the polyline
-        this.map.fitBounds(this.polyline.getBounds());
-        if (typeof callback === 'function') callback();
-    }
+    setStartMarker(latlng, callback) {
+        this.marker1 = L.marker(latlng).addTo(this.map);
 
-    setPath(latlng, callback) {
-        // this.map.setView(latlng, 13);
-        // this.marker = L.marker(latlng).addTo(this.map);
-        var latlngs = [[latlng.lat, latlng.lng],
-                       [40.7317, -73.9867]];
-        this.polyline = L.polyline(latlngs, {color: 'blue'}).addTo(this.map);
-        // zoom the map to the polyline
+        this.latlngs[0] = [latlng.lat, latlng.lng];
+        this.polyline = L.polyline(this.latlngs, {color: 'blue'}).addTo(this.map);
         this.map.fitBounds(this.polyline.getBounds());
 
         if (typeof callback === 'function') callback();
     }
 
-    whenMarkerSet({ lat, lng: lon }) {
+    setEndMarker(latlng, callback) {
+        this.marker2 = L.marker(latlng).addTo(this.map);
+
+        this.latlngs[1] = [latlng.lat, latlng.lng];
+        this.polyline = L.polyline(this.latlngs, {color: 'blue'}).addTo(this.map);
+        this.map.fitBounds(this.polyline.getBounds());
+
+        if (typeof callback === 'function') callback();
+    }
+
+    whenStartMarkerSet({ lat, lng: lon }) {
+        this.props.onClick({ lat, lon });
+    }
+
+    whenEndMarkerSet({ lat, lng: lon }) {
         this.props.onClick({ lat, lon });
     }
 
