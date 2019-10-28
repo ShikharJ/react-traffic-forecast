@@ -24,6 +24,7 @@ class Map extends PureComponent {
 
         this.map = null;
         this.marker = null;
+        this.polyline = null;
         this.tileLayerUrl = 'https://{s}.tile.osm.org/{z}/{x}/{y}.png';
     }
 
@@ -56,6 +57,7 @@ class Map extends PureComponent {
 
         this.map.on('click', ({ latlng }) => {
             if (typeof this.marker !== 'undefined') this.map.removeLayer(this.marker);
+            if (typeof this.polyline !== 'undefined') this.map.removeLayer(this.polyline);
             this.setMarker(latlng, () => {
                 this.whenMarkerSet(latlng);
             });
@@ -65,6 +67,22 @@ class Map extends PureComponent {
     setMarker(latlng, callback) {
         this.map.setView(latlng, 13);
         this.marker = L.marker(latlng).addTo(this.map);
+        var latlngs = [[latlng.lat, latlng.lng],
+                       [40.7317, -73.9867]];
+        this.polyline = L.polyline(latlngs, {color: 'blue'}).addTo(this.map);
+        // zoom the map to the polyline
+        this.map.fitBounds(this.polyline.getBounds());
+        if (typeof callback === 'function') callback();
+    }
+
+    setPath(latlng, callback) {
+        // this.map.setView(latlng, 13);
+        // this.marker = L.marker(latlng).addTo(this.map);
+        var latlngs = [[latlng.lat, latlng.lng],
+                       [40.7317, -73.9867]];
+        this.polyline = L.polyline(latlngs, {color: 'blue'}).addTo(this.map);
+        // zoom the map to the polyline
+        this.map.fitBounds(this.polyline.getBounds());
 
         if (typeof callback === 'function') callback();
     }
