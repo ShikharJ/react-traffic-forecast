@@ -38,8 +38,8 @@ class Map extends PureComponent {
     componentDidUpdate() {
         const { popupText } = this.props;
 
-        if (this.marker1 && popupText && this.latest) this.marker1.bindPopup(popupText).openPopup();
-        if (this.marker2 && popupText && !this.latest) this.marker2.bindPopup(popupText).openPopup();
+        if (this.marker1 && popupText && this.latest) this.marker1.bindPopup('From: ' + popupText).openPopup();
+        if (this.marker2 && popupText && !this.latest) this.marker2.bindPopup('To: ' + popupText).openPopup();
     }
 
     componentWillUnmount() {
@@ -61,11 +61,13 @@ class Map extends PureComponent {
         this.map.fitBounds(this.polyline.getBounds());
 
         this.setStartMarker({
+            marker: 'start',
             lat: coord.lat,
             lng: coord.lon
         });
 
         this.setEndMarker({
+            marker: 'end',
             lat: coord.lat,
             lng: coord.lon
         });
@@ -75,7 +77,10 @@ class Map extends PureComponent {
             if (typeof this.marker1 !== 'undefined') this.map.removeLayer(this.marker1);
             if (typeof this.polyline !== 'undefined') this.map.removeLayer(this.polyline);
             this.setStartMarker(latlng, () => {
-                this.whenStartMarkerSet(latlng);
+                var newlatlng = {marker: 'start',
+                                 lat: latlng.lat,
+                                 lng: latlng.lng}
+                this.whenStartMarkerSet(newlatlng);
             });
         });
 
@@ -84,13 +89,18 @@ class Map extends PureComponent {
             if (typeof this.marker2 !== 'undefined') this.map.removeLayer(this.marker2);
             if (typeof this.polyline !== 'undefined') this.map.removeLayer(this.polyline);
             this.setEndMarker(latlng, () => {
-                this.whenEndMarkerSet(latlng);
+                var newlatlng = {marker: 'end',
+                                 lat: latlng.lat,
+                                 lng: latlng.lng}
+                this.whenEndMarkerSet(newlatlng);
             });
         });
     }
 
     setStartMarker(latlng, callback) {
-        this.marker1 = L.marker(latlng).addTo(this.map);
+        var coords = {lat: latlng.lat,
+                      lng: latlng.lng,}
+        this.marker1 = L.marker(coords).addTo(this.map);
 
         this.latlngs[0] = [latlng.lat, latlng.lng];
         this.polyline = L.polyline(this.latlngs, {color: 'blue'}).addTo(this.map);
@@ -100,7 +110,9 @@ class Map extends PureComponent {
     }
 
     setEndMarker(latlng, callback) {
-        this.marker2 = L.marker(latlng).addTo(this.map);
+        var coords = {lat: latlng.lat,
+                      lng: latlng.lng,}
+        this.marker2 = L.marker(coords).addTo(this.map);
 
         this.latlngs[1] = [latlng.lat, latlng.lng];
         this.polyline = L.polyline(this.latlngs, {color: 'blue'}).addTo(this.map);
@@ -109,12 +121,12 @@ class Map extends PureComponent {
         if (typeof callback === 'function') callback();
     }
 
-    whenStartMarkerSet({ lat, lng: lon }) {
-        this.props.onClick({ lat, lon });
+    whenStartMarkerSet({ marker, lat, lng: lon }) {
+        this.props.onClick({ marker, lat, lon });
     }
 
-    whenEndMarkerSet({ lat, lng: lon }) {
-        this.props.onClick({ lat, lon });
+    whenEndMarkerSet({ marker, lat, lng: lon }) {
+        this.props.onClick({ marker, lat, lon });
     }
 
     destroy() {
