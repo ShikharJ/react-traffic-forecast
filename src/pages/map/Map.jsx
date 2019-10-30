@@ -38,8 +38,18 @@ class Map extends PureComponent {
     componentDidUpdate() {
         const { popupText } = this.props;
 
-        if (this.marker1 && popupText && this.latest) this.marker1.bindPopup('From: ' + popupText).openPopup();
-        if (this.marker2 && popupText && !this.latest) this.marker2.bindPopup('To: ' + popupText).openPopup();
+        if (this.marker1 && popupText && this.latest){
+            var list = '<b>' + 'From: ' + '</b>' + popupText + '<dt>' + '<b>' + 'Lat: ' +
+            '</b>' + this.latlngs[0][0].toFixed(4) + '</dt>' + '<dt>' + '<b>' + 'Lon: ' +
+            '</b>' + this.latlngs[0][1].toFixed(4) + '</dt>';
+            this.marker1.bindPopup(list).openPopup();
+        }
+        if (this.marker2 && popupText && !this.latest){
+            var list = '<b>' + 'To: ' + '</b>' + popupText + '<dt>' + '<b>' + 'Lat: ' +
+            '</b>' + this.latlngs[1][0].toFixed(4) + '</dt>' + '<dt>' + '<b>' + 'Lon: ' +
+            '</b>' + this.latlngs[1][1].toFixed(4) + '</dt>';
+            this.marker2.bindPopup(list).openPopup();
+        }
     }
 
     componentWillUnmount() {

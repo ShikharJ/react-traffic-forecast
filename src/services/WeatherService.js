@@ -1,20 +1,24 @@
 /**
  * Created by ivan on 24.06.18.
+ * Modified by Shikhar on 28.10.19.
  */
 
 import axios from 'axios';
 import API from './API';
 
 const APP_ID = '093c63d1d6dd2f0f77c6f14d91a19042';
+var start_data_list, end_data_list;
 
 class WeatherService {
-    static getWeatherByPosition(requestParams, cancelToken) {
+    static getWeatherByPosition(requestParams, cancelToken, marker) {
         const params = {
             cnt: 10,
             appid: APP_ID,
             units: 'metric',
             ...requestParams
         };
+
+        console.log(marker);
 
         return axios.get(API.forecastDaily, {
             params,
@@ -38,6 +42,18 @@ class WeatherService {
                 return { city, list };
             }
         });
+    }
+
+    static findGrid(lat, lon) {
+        
+
+        return gridNumber;
+    }
+
+    static findTraffic(lat, lon) {
+        
+
+        return {incoming, outgoing};
     }
 
     static findCities(q, cancelToken) {
