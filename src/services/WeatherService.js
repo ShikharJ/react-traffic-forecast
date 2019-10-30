@@ -12,8 +12,7 @@ import saturday from '../data/json/saturday.json';
 import sunday from '../data/json/sunday.json';
 
 const APP_ID = '093c63d1d6dd2f0f77c6f14d91a19042';
-let start = -1,
-  destination = -1;
+let start = 287, destination = 287;
 var start_data_list, end_data_list;
 
 class WeatherService {
