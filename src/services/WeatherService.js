@@ -16,24 +16,13 @@ let start = 287, destination = 287;
 var start_data_list, end_data_list;
 
 class WeatherService {
-  findGrid(lat, lon) {
-    console.log(lat, log);
-    console.log(grid);
-  }
-
-  findTraffic(src, dest) {
-    return { incoming, outgoing };
-  }
-
   static getWeatherByPosition(requestParams, cancelToken, marker) {
     const params = {
-      cnt: 5,
+      cnt: 6,
       appid: APP_ID,
       units: 'metric',
       ...requestParams
     };
-
-    //console.log(marker);
 
     return axios.get(API.forecastDaily, {
       params,
@@ -46,11 +35,9 @@ class WeatherService {
 
         if (marker === 'start') {
           let min = 9999999;
-          start = -1;
+
           for (let i = 0; i < grid.length; i++) {
-            let value =
-              Math.pow(grid[i].latitude - lat, 2) +
-              Math.pow(grid[i].longitude - lon, 2);
+            let value = Math.pow(grid[i].latitude - lat, 2) + Math.pow(grid[i].longitude - lon, 2);
 
             if (min > value) {
               min = value;
@@ -58,13 +45,12 @@ class WeatherService {
             }
           }
         }
+
         if (marker === 'end') {
           let min = 9999999;
-          destination = -1;
+
           for (let i = 0; i < grid.length; i++) {
-            let value =
-              Math.pow(grid[i].latitude - lat, 2) +
-              Math.pow(grid[i].longitude - lon, 2);
+            let value = Math.pow(grid[i].latitude - lat, 2) + Math.pow(grid[i].longitude - lon, 2);
 
             if (min > value) {
               min = value;
@@ -73,39 +59,59 @@ class WeatherService {
           }
         }
 
-        console.log(start, destination);
-
-        const mondayData = monday.filter(val => {
-          return val.src == start && val.des == destination;
-        });
-
-        console.log(mondayData);
-
-        // const mondayData = monday.filter(val => {
-        //   return val.src == start && val.des == destination;
-        // });
-
-        // console.log(mondayData);
-
-        // const mondayData = monday.filter(val => {
-        //   return val.src == start && val.des == destination;
-        // });
-
-        // console.log(mondayData);
+        let satData = saturday.filter(val => { return val.src == start && val.des == destination; });
+        let sunData = sunday.filter(val => { return val.src == start && val.des == destination; });
+        let monData = monday.filter(val => { return val.src == start && val.des == destination; });
+        satData = satData.concat(saturday.filter(val => { return val.src == destination && val.des == start; }));
+        sunData = sunData.concat(sunday.filter(val => { return val.src == destination && val.des == start; }));
+        monData = monData.concat(monday.filter(val => { return val.src == destination && val.des == start; }));
 
         list = list.map(day => {
           return {
             date: day.dt,
-            humidity: day.humidity,
-            speed: day.speed,
-            temp: day.temp,
+            oft: day.humidity,
+            ort: day.speed,
+            eft: day.humidity,
+            ert: day.speed,
             main: {
               icon: day.weather[0].icon,
               description: day.weather[0].description
             }
           };
         });
-        //list = list.slice(0, 4);
+
+        console.log(list[0]);
+
+        for (let i = 0; i < 3; i++) {
+            if (i == 0){
+                list[i].oft = Math.round(satData[0].observedTraffic);
+                list[i].ort = Math.round(satData[1].observedTraffic);
+                list[i].eft = Math.round(satData[0].estimatedTraffic);
+                list[i].ert = Math.round(satData[1].estimatedTraffic);
+                list[i + 3].oft = Math.round(satData[0].observedTraffic);
+                list[i + 3].ort = Math.round(satData[1].observedTraffic);
+                list[i + 3].eft = Math.round(satData[0].estimatedTraffic);
+                list[i + 3].ert = Math.round(satData[1].estimatedTraffic);
+            } else if (i == 1){
+                list[i].oft = Math.round(sunData[0].observedTraffic);
+                list[i].ort = Math.round(sunData[1].observedTraffic);
+                list[i].eft = Math.round(sunData[0].estimatedTraffic);
+                list[i].ert = Math.round(sunData[1].estimatedTraffic);
+                list[i + 3].oft = Math.round(sunData[0].observedTraffic);
+                list[i + 3].ort = Math.round(sunData[1].observedTraffic);
+                list[i + 3].eft = Math.round(sunData[0].estimatedTraffic);
+                list[i + 3].ert = Math.round(sunData[1].estimatedTraffic);
+            } else{
+                list[i].oft = Math.round(monData[0].observedTraffic);
+                list[i].ort = Math.round(monData[1].observedTraffic);
+                list[i].eft = Math.round(monData[0].estimatedTraffic);
+                list[i].ert = Math.round(monData[1].estimatedTraffic);
+                list[i + 3].oft = Math.round(monData[0].observedTraffic);
+                list[i + 3].ort = Math.round(monData[1].observedTraffic);
+                list[i + 3].eft = Math.round(monData[0].estimatedTraffic);
+                list[i + 3].ert = Math.round(monData[1].estimatedTraffic);
+            }
+        }
 
         return { city, list };
       }
@@ -115,7 +121,7 @@ class WeatherService {
   static findCities(q, cancelToken) {
     const params = {
       q,
-      cnt: 5,
+      cnt: 6,
       appid: APP_ID
     };
 

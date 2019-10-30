@@ -73,16 +73,14 @@ const WeatherCard = memo(props => {
                 </div>
             </Header>
 
-            <Temperature>
-                <strong>
-                    <Celsius temp={day.temp.max} />
-                </strong>
-                | <Celsius temp={day.temp.min} />
-            </Temperature>
+            <Additional>
+                <div><strong>Observed Forward Traffic: </strong>{day.oft} </div>
+                <div><strong>Observed Return Traffic: </strong>{day.ort} </div>
+            </Additional>
 
             <Additional>
-                <div>Forward Traffic: {day.humidity} %</div>
-                <div>Return Traffic: {day.speed} mps</div>
+                <div><strong>Estimated Forward Traffic: </strong>{day.eft} </div>
+                <div><strong>Estimated Return Traffic: </strong>{day.ert} </div>
             </Additional>
         </Card>
     );
