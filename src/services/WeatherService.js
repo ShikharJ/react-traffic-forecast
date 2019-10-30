@@ -1,5 +1,4 @@
 /**
- * Created by ivan on 24.06.18.
  * Modified by Shikhar on 28.10.19.
  */
 
@@ -79,8 +78,6 @@ class WeatherService {
             }
           };
         });
-
-        console.log(list[0]);
 
         for (let i = 0; i < 3; i++) {
             if (i == 0){

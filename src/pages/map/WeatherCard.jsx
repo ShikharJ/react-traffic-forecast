@@ -1,5 +1,5 @@
 /**
- * Created by ivan on 02.07.18.
+ * Created by Shikhar on 25.10.19.
  */
 
 import React, { memo } from 'react';
