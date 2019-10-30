@@ -10,22 +10,37 @@ const APP_ID = '093c63d1d6dd2f0f77c6f14d91a19042';
 var start_data_list, end_data_list;
 
 class WeatherService {
+
+    static findGrid(lat, lon) {
+        
+
+        return gridNumber;
+    }
+
+    static findTraffic(src, dest) {
+        
+
+        return {incoming, outgoing};
+    }
+
     static getWeatherByPosition(requestParams, cancelToken, marker) {
         const params = {
-            cnt: 10,
+            cnt: 5,
             appid: APP_ID,
             units: 'metric',
             ...requestParams
         };
 
-        console.log(marker);
+        //console.log(marker);
 
         return axios.get(API.forecastDaily, {
             params,
             cancelToken,
             transformResponse: (data) => {
                 let { city, list = [] } = JSON.parse(data);
-
+                //console.log(city);
+                //grid = findGrid(city.coord.lat, city.coord.lon);
+                //console.log(grid);
                 list = list.map(day => {
                     return {
                         date: day.dt,
@@ -38,28 +53,17 @@ class WeatherService {
                         }
                     };
                 });
+                //list = list.slice(0, 4);
 
                 return { city, list };
             }
         });
     }
 
-    static findGrid(lat, lon) {
-        
-
-        return gridNumber;
-    }
-
-    static findTraffic(lat, lon) {
-        
-
-        return {incoming, outgoing};
-    }
-
     static findCities(q, cancelToken) {
         const params = {
             q,
-            cnt: 10,
+            cnt: 5,
             appid: APP_ID
         };
 
