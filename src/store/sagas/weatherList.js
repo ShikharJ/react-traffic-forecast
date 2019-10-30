@@ -8,7 +8,7 @@ var start_data;
 const fetchWeatherList = function* (action) {
     const cancelSource = axios.CancelToken.source();
     const token = cancelSource.token;
-    console.log(action.data);
+    // console.log(action.data);
 
     if (action.data.marker)
     {
